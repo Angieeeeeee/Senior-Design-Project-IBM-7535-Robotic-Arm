@@ -33,17 +33,59 @@
 #include "IBM7535.h"
 
 // Initializes the control system
-void initOptaControl ()
-{
-	
-}
 void initIBM7535 ()
 {
+	Serial.begin(115200);
+	delay(1000);
 	
+	OptaController.begin();
+	
+	pinMode(A0, INPUT_PULLUP);  // I1 - θ₁ home
+	pinMode(A1, INPUT_PULLUP);  // I2 - θ₁ overrun (shared)
+	pinMode(A3, INPUT_PULLUP);  // I4 - θ₂ home
+	pinMode(A4, INPUT_PULLUP);  // I5 - θ₂ overrun+
+	pinMode(A5, INPUT_PULLUP);  // I6 - θ₂ overrun−
+	
+	
+	
+	
+	while (OptaController.getExpansionNum() < 3) 
+	{
+		Serial.println("Waiting for expansions...");
+		OptaController.update();
+		delay(500);
+	}
+	
+	AnalogExpansion aexp = OptaController.getExpansion(0);
+	DigitalExpansion dexp = OptaController.getExpansion(1);
+	
+	if (aexp)
+	{
+		aexp.beginChannelAsDac(2, OA_VOLTAGE_DAC, true, false, OA_SLEW_RATE_0);
+		aexp.beginChannelAsDac(3, OA_VOLTAGE_DAC, true, false, OA_SLEW_RATE_0);
+		aexp.beginChannelAsDac(5, OA_VOLTAGE_DAC, true, false, OA_SLEW_RATE_0);
+		aexp.beginChannelAsDac(6, OA_VOLTAGE_DAC, true, false, OA_SLEW_RATE_0);
+		
+		aexp.setPwm(OA_PWM_CH_0, STEPPER_PERIOD, 0);
+		aexp.setPwm(OA_PWM_CH_1, STEPPER_PERIOD, 0);
+		
+		aexp.pinVoltage(5, 0.0f);
+		aexp.pinVoltage(6, 0.0f);
+		aexp.pinVoltage(2, 0.0f);
+		aexp.pinVoltage(3, 0.0f);
+	}
+	
+	if (dexp) 
+	{
+		
+	}
+	
+	
+	OptaController.update();
 }
 
 
-void theta1CW (AnalogExpansion* aexp, float voltage)
+void theta1CW (AnalogExpansion aexp, float voltage)
 {
 	float vmap;
 	
@@ -53,8 +95,8 @@ void theta1CW (AnalogExpansion* aexp, float voltage)
 	
 	if (vmap > OPTA_DAC_MAX) vmap = OPTA_DAC_MAX;
 	
-	aexp.pinVoltage(/*N*/, 0.0f, true); 
-	aexp.pinVoltage((/*N*/, vmap, true); 
+	aexp.pinVoltage(2, 0.0f, true); 
+	aexp.pinVoltage((3, vmap, true); 
 }
 void theta1CCW (AnalogExpansion* aexp, float voltage)
 {
@@ -66,10 +108,10 @@ void theta1CCW (AnalogExpansion* aexp, float voltage)
 	
 	if (vmap > OPTA_DAC_MAX) vmap = OPTA_DAC_MAX;
 	
-	aexp.pinVoltage((/*N*/, vmap, true); 
-	aexp.pinVoltage((/*N*/, 0.0f, true); 
+	aexp.pinVoltage((2, vmap, true); 
+	aexp.pinVoltage((3, 0.0f, true); 
 }
-void theta2CW (AnalogExpansion* aexp, float voltage)
+void theta2CW (AnalogExpansion aexp, float voltage)
 {
 	// vmap represents the actual output voltage needed from the Opta
 	// to be able to generate the reference voltage specifed.
@@ -99,7 +141,7 @@ void theta2CCW (AnalogExpansion* aexp, float voltage)
 }
 
 
-void zUp (AnalogExpansion* aexp)
+void zUp (AnalogExpansion aexp)
 {
 	/* checks if the PNs are in the down position
 	 * there are two separate lim sw for the PNs, different feedback
@@ -112,24 +154,24 @@ void zUp (AnalogExpansion* aexp)
 	*/
 }
 
-void zDown(AnalogExpansion* aexp)
+void zDown(AnalogExpansion aexp)
 {
 	
 }
 
-void gripperOpen(AnalogExpansion* aexp)
+void gripperOpen(AnalogExpansion aexp)
 {
 	
 }
 
-void gripperClose(AnalogExpansion* aexp)
+void gripperClose(AnalogExpansion aexp)
 {
 	
 }
 
 
 // Rotates the roll stepper motor in the clockwise direction
-void rollCW (AnalogExpansion* aexp, uint32_t pulse)
+void rollCW (AnalogExpansion aexp, uint32_t pulse)
 {
 	// Because of the stepper card's hardware quirks, direction is 
 	// controlled by separate PWM lines, which means* that the channel
@@ -144,7 +186,7 @@ void rollCW (AnalogExpansion* aexp, uint32_t pulse)
 }
 
 // Rotates the roll stepper motor in the counterclockwise direction
-void rollCCW (AnalogExpansion* aexp, uint32_t pulse)
+void rollCCW (AnalogExpansion aexp, uint32_t pulse)
 {
 	aexp.setPwm(OA_PWM_CH_0, STEPPER_PERIOD, 0);
 	aexp.setPwm(OA_PWM_CH_1, STEPPER_PERIOD, pulse);

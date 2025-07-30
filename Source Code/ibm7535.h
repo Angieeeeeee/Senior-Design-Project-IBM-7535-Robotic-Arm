@@ -37,7 +37,10 @@
 // switches, is not supported at present. 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-// AUTHORIAL INFO
+// CREDITS
+// Library Author: Xander Addington
+// Original Test Code: Travis Parker
+// OptaBlue Library created by Arduino
 // 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -48,6 +51,8 @@
 
 #ifndef _IBM7535_H_
 #define _IBM7535_H_
+
+#include "../Arduino_Opta_Blueprint/src/Optablue.h"
 
 // PWM period for the roll axis
 // 1 / 400 us = 2.5 kHz
@@ -69,7 +74,6 @@
 // because my calculator can't do that
 
 // Initializes the control system
-void initOptaControl ();
 void initIBM7535 ();
 
 // For the Theta 1 and 2 motors, the control system provides a voltage
@@ -79,27 +83,49 @@ void initIBM7535 ();
 // the PWM signals and handling some of the motor feedback. 
 // The voltage parameter is the desired reference voltage for the 
 // servo packs, and has a range of 0.0 to 5.0 (volts)
-void theta1CW (AnalogExpansion* aexp, float voltage);
-void theta1CCW (AnalogExpansion* aexp, float voltage);
-void theta2CW (AnalogExpansion* aexp, float voltage);
-void theta2CCW (AnalogExpansion* aexp, float voltage);
+// Counter Clockwise (CCW) represents is the positive direction
+// Clockwise (CW) represents the negative direction
+void theta1CW (AnalogExpansion aexp, float voltage);
+void theta1CCW (AnalogExpansion aexp, float voltage);
+void theta2CW (AnalogExpansion aexp, float voltage);
+void theta2CCW (AnalogExpansion aexp, float voltage);
 
 
 // The Z axis and gripper attachment are both controlled by simple solenoids
 // driven by a 24 volt trigger.
 // The gripper attachment is not included with our IBM7535 arm at time of 
 // this writing.
-void zUp (AnalogExpansion* aexp);
-void zDown(AnalogExpansion* aexp);
-void gripperOpen(AnalogExpansion* aexp);
-void gripperClose(AnalogExpansion* aexp);
+void zUp (AnalogExpansion aexp);
+void zDown(AnalogExpansion aexp);
+void gripperOpen(AnalogExpansion aexp);
+void gripperClose(AnalogExpansion aexp);
 
 
 // The roll axis is driven by a stepper motor connected to a separate 
 // stepper card that accepts a two PWM signals from the main controller,
 // one for each rotational direction.
 // These functions provide the duty cycle for the PWM signals.
-void rollCW (AnalogExpansion* aexp, uint32_t pulse);
-void rollCCW (AnalogExpansion* aexp, uint32_t pulse);
+void rollCW (AnalogExpansion aexp, uint32_t pulse);
+void rollCCW (AnalogExpansion aexp, uint32_t pulse);
+
+
+// 
+// 
+bool getTheta2OverrunPos (AnalogExpansion aexp);
+bool getTheta2OverrunNeg (AnalogExpansion aexp);
+bool getTheta2Home (AnalogExpansion aexp);
+
+bool getTheta1OverrunPos (AnalogExpansion aexp);
+bool getTheta1OverrunNeg (AnalogExpansion aexp);
+bool getTheta1Home (AnalogExpansion aexp);
+
+float getTheta1Position (AnalogExpansion aexp);
+float getTheta2Position (AnalogExpansion aexp);
+
+bool getRollHome (AnalogExpansion aexp);
+
+bool getZUp (AnalogExpansion aexp);
+bool getZDown (AnalogExpansion aexp);
+
 
 #endif
