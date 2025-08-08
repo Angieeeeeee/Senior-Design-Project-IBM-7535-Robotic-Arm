@@ -8,7 +8,7 @@ The goal was to replace the obsolete control system with an **Arduino Opta PLC**
 
 Originally designed for industrial automation, the IBM 7535 had been rendered non-functional due to outdated electronics, limited documentation, and component issues. Our team reverse-engineered the system, traceed its wiring diagrams, and designed a new control approach compatible with the existing **Yaskawa Servopak motor drivers**. This included:
 - developing an **analog ±10V control solution** using op-amp subtractor circuits, enabling bidirectional motor control from the Arduino Opta’s 0–10V outputs
-- making a voltage divider circuit using Zener diodes to enable bidirectional control for the stepper motor
+- making a **voltage divider circuit using Zener diodes** to enable bidirectional control for the stepper motor
 - successfully pulse the stepper motor at operable speed
 - send voltage to operate the solenoids
 
